@@ -1,0 +1,187 @@
+function processData(input) {
+   /*  Example input:  
+X  
+___  
+___  
+_XO  
+Example output:
+1 0 
+
+New board:
+___  
+X__  
+_XO  
+*/
+      var computer;
+  var selector;
+  var first;
+var move;
+    input = input.split('\n');
+    computer = input.shift();
+    var selector = (computer == "X") ? "O" : "X";
+    
+    
+ function summary() {
+    var arr = []
+    
+     
+    for (var x = 0; x < 3; x++) {
+        var row = input[x].split('');
+        for (var i = 0; i < 3; i++) {
+
+      if (row[i] == "X") {
+        arr.push(1);
+      } else if (row[i] == "O") {
+        arr.push(-1)
+      } else {
+        arr.push(0);
+      }
+        }
+    }
+    return arr;
+  }
+    
+  var WIN_COMBOS = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ]
+
+  function wins(state, player) {
+    var win;
+   var playerNum;
+    if (player == "X") {
+      playerNum = 1
+    } else if (player == "O") {
+      playerNum =-1
+    }
+    for (var i = 0; i < WIN_COMBOS.length; i++) {
+      win = true;
+      for (var j = 0; j < WIN_COMBOS[i].length; j++) {
+        if (state[WIN_COMBOS[i][j]] != player && state[WIN_COMBOS[i][j]] != playerNum) {
+          win = false;
+        }
+      }
+      if (win) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function count(arr) {
+    var call = 0;
+    for (var x = 0; x < arr.length; x++) {
+      if (arr[x] !== 0) {
+        call += 1;
+      }
+    }
+return call;
+  }
+
+  function score(state, depth) {
+    
+    if (wins(state, "X") == true) {
+    
+      return 10 - depth;
+    } else if (wins(state, "O") == true) {
+      return depth - 10;
+    } else {
+      return 0;
+    }
+  }
+  var AI_MOVE;
+
+  function next(arr, player, count1) {
+    if (move == 0 && player == "X") {
+      AI_MOVE = 8
+      return 0;
+    }
+    var opponent = (player == "X") ? "O" : "X";
+        var choices = [];
+    for (var x = 0; x<arr.length; x++) {    
+      if (arr[x] == 0) {     
+        choices.push(x)
+      }
+    }   
+    if (wins(arr, opponent) || wins(arr, player) || choices.length == 0) { 
+      
+      return score(arr, count1);
+    }
+    var max_score;
+    var  min_score
+    var  scores = []
+   var   moves = [];
+ var current = []
+ var friend = 0;
+
+    if (choices.length == 0) {console.log('flippety')}
+    for (var x in choices) {
+  current = arr.slice(0, arr.length)       
+        moves.push(choices[x]);      
+        if (player == "O") {
+          current[choices[x]] = -1;
+        } else {
+          current[choices[x]] = 1;
+        }                     
+        var count2 = count1+1;   
+        scores.push(next(current, opponent, (count2)))
+    }
+if (count1 == 0) {
+
+}
+    if (player == "X") {
+     if (count1 === 0) {
+       AI_MOVE = moves[0];
+     }
+      
+      max_score = scores[0];
+      for (var s in scores) {
+        if (scores[s] > max_score) {
+          max_score = scores[s];
+               if (count1 === 0) {
+       AI_MOVE = moves[s];
+     }
+          
+        }
+      }
+      return max_score;
+    } else {
+       
+           if (count1 === 0) {
+       AI_MOVE = moves[0];
+     }
+      min_score = scores[0];
+      for (var s in scores) {
+        if (scores[s] < min_score) {
+          min_score = scores[s];
+               if (count1 === 0) {
+                 
+       AI_MOVE = moves[s];
+     }
+        }
+      }
+      return min_score;
+    }
+
+  } //end next
+
+    
+    var arr = summary();
+    move = 9 - count(arr);
+    next(arr, computer, 0)
+    var y = AI_MOVE;
+    if (y >2 && y <6) {
+        y = "1 " + (y-3);
+    } else if (y > 5) {
+                y = "2 " + (y-6);
+    } else {
+        y = "0 " + y
+    }
+    console.log(y);
+}// end all 
